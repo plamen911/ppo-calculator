@@ -14,7 +14,7 @@ const initial: SectionIInput = {
   b: 12,
   I: 0.1,
   shape: 'two_aa',
-  jet: 'B',
+  jet: 'C',
   hg: 5,
   protectionJets: 0,
 }
