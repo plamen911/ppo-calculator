@@ -36,7 +36,7 @@ export default function App() {
         <div className="brand">
           <span className="logo">🔥</span>
           <div>
-            <div className="title">Калкулатор за план за гасене на пожар</div>
+            <div className="title">Калкулатор за план за пожарогасене</div>
             <div className="subtitle">Сили и средства за гасене на пожар · Приложение № 5</div>
           </div>
         </div>

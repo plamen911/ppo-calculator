@@ -20,7 +20,7 @@ export function AboutModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
         <div className="about-body">
-          <p className="about-logo">🔥 Калкулатор за план за гасене на пожар</p>
+          <p className="about-logo">🔥 Калкулатор за план за пожарогасене</p>
           <p>
             Приложение за изчисляване на силите и необходимите средства за гасене на пожар
             по Методиката от Приложение № 5 — твърди горими вещества, ЛЗТ и ГТ (резервоари и

@@ -37,7 +37,7 @@
   },
   "build": {
     "appId": "bg.ppo.calculator",
-    "productName": "Калкулатор за план за гасене на пожар",
+    "productName": "Калкулатор за план за пожарогасене",
     "directories": {
       "output": "release"
     },
