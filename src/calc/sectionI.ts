@@ -182,7 +182,10 @@ export function calcSectionI(inp: SectionIInput): CalcOutput<SectionIResult> {
   })
   steps.push({
     kind: 'math',
-    tex: `N_{пожарникари} = 2 \\cdot ${N_jets} + 1 \\cdot ${z} = ${N_firefighters}`,
+    tex:
+      z > 0
+        ? `N_{пожарникари} = 2 \\cdot ${N_jets} + 1 \\cdot ${z} = ${N_firefighters}`
+        : `N_{пожарникари} = 2 \\cdot ${N_jets} = ${N_firefighters}`,
   })
 
   steps.push({ kind: 'result', label: 'Брой струйници (общо)', tex: `${N_jets_total}` })
