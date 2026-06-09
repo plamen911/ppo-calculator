@@ -42,6 +42,22 @@ npm run dist:win   # NSIS инсталатор + portable .exe (изисква W
   билдът за разпространение да се прави на **Windows** или в **CI** (напр. GitHub Actions
   `windows-latest`), където Wine не е нужен.
 
+### Windows 7 (наследен билд)
+
+Стандартният билд използва Electron 42, който **не работи на Windows 7/8/8.1**
+(Electron спира поддръжката им от версия 23). За тези системи има отделен билд с
+**Electron 22.3.27** — последната версия със поддръжка на Windows 7:
+
+```bash
+npm run dist:win7   # release-win7/ppo-calc-win7.exe (portable) + инсталатор
+```
+
+- Главният процес се компилира до **CommonJS** (`scripts/build-electron-win7.mjs`,
+  esbuild), тъй като Electron 22 не поддържа ESM. Конфигурацията е в
+  `electron-builder-win7.yml`, а изходът отива в `release-win7/`.
+- Билдът е с по-стар Chromium и **без обновления за сигурност** (Electron 22 е EOL).
+  Ползвай го само за Windows 7; за Windows 10/11 разпространявай стандартния `ppo-calc.exe`.
+
 ## Публикуване
 
 Приложението има две части за разпространение: **уеб версия** (статичен билд) и
@@ -75,12 +91,16 @@ https://github.com/plamen911/ppo-calculator/releases/latest/download/ppo-calc.ex
 Стъпки:
 
 ```bash
-npm run dist:win   # създава release/ppo-calc.exe (portable) и инсталатор
-gh release create v1.0.0 release/ppo-calc.exe --title "v1.0.0" --notes "First release"
+npm run dist:win    # release/ppo-calc.exe (Windows 10/11)
+npm run dist:win7   # release-win7/ppo-calc-win7.exe (Windows 7)
+gh release create v1.0.0 \
+  release/ppo-calc.exe \
+  release-win7/ppo-calc-win7.exe \
+  --title "v1.0.0" --notes "First release"
 ```
 
-> Името на качения файл трябва да е точно `ppo-calc.exe`, за да работи връзката
-> към последния release.
+> Имената на качените файлове трябва да са точно `ppo-calc.exe` и
+> `ppo-calc-win7.exe`, за да работят връзките към последния release.
 
 ## Структура
 

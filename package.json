@@ -14,7 +14,10 @@
     "test:watch": "vitest",
     "dist": "vite build && electron-builder",
     "dist:win": "vite build && electron-builder --win --x64",
-    "pack:win": "vite build && electron-builder --win --x64 --dir"
+    "pack:win": "vite build && electron-builder --win --x64 --dir",
+    "build:electron:win7": "node scripts/build-electron-win7.mjs",
+    "dist:win7": "vite build --mode win7 && node scripts/build-electron-win7.mjs && electron-builder --win --x64 --config electron-builder-win7.yml",
+    "pack:win7": "vite build --mode win7 && node scripts/build-electron-win7.mjs && electron-builder --win --x64 --dir --config electron-builder-win7.yml"
   },
   "dependencies": {
     "katex": "^0.16.11",

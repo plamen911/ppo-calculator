@@ -81,6 +81,20 @@ body {
   text-decoration: none;
 }
 
+/* Subtle secondary link for the legacy Windows 7 download */
+.actions .win7-link {
+  margin-left: 6px;
+  color: #fff;
+  opacity: 0.7;
+  font-size: 11px;
+  text-decoration: underline;
+  align-self: center;
+}
+
+.actions .win7-link:hover {
+  opacity: 1;
+}
+
 .actions button:hover,
 .actions .btn:hover {
   background: rgba(255, 255, 255, 0.28);

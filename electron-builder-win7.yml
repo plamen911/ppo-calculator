@@ -1,0 +1,32 @@
+# Windows 7 build config — uses Electron 22.3.27, the last version that runs on
+# Windows 7/8/8.1. Produced by `npm run dist:win7` (which first runs the CommonJS
+# Vite build via `--mode win7`). Output goes to release-win7/ to avoid clobbering
+# the modern (Electron 42) build in release/.
+appId: bg.ppo.calculator
+productName: Калкулатор за план за пожарогасене
+electronVersion: 22.3.27
+directories:
+  output: release-win7
+# The Win7 bundle is CommonJS; override the packaged app's package.json so
+# main.js/preload.js are loaded as CJS, not ESM.
+extraMetadata:
+  main: dist-electron/main.js
+  type: commonjs
+files:
+  - dist/**/*
+  - dist-electron/**/*
+win:
+  executableName: ppo-calc-win7
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: ppo-calc-win7-setup.${ext}
+portable:
+  artifactName: ppo-calc-win7.${ext}

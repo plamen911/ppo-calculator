@@ -2,6 +2,7 @@ node_modules
 dist
 dist-electron
 release
+release-win7
 *.log
 .DS_Store
 .idea

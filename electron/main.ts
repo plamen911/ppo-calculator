@@ -3,10 +3,20 @@ import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import fs from 'node:fs'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// Injected at build time: 'preload.mjs' (ESM) or 'preload.js' (CJS/Win7).
+declare const __PRELOAD__: string
+// Injected at build time: false for the ESM build, true for the CommonJS (Win7) build.
+// The unused branch is dead-code-eliminated, so each format keeps only its native
+// way of resolving the directory (`__dirname` is empty under ESM; `import.meta.url`
+// is empty under CJS).
+declare const __IS_CJS__: boolean
+
+const baseDir = __IS_CJS__
+  ? __dirname
+  : path.dirname(fileURLToPath(import.meta.url))
 
 // dist-electron/main.js -> app root is one level up
-process.env.APP_ROOT = path.join(__dirname, '..')
+process.env.APP_ROOT = path.join(baseDir, '..')
 
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
@@ -21,7 +31,7 @@ function createWindow() {
     minHeight: 600,
     title: 'Калкулатор за план за пожарогасене',
     webPreferences: {
-      preload: path.join(__dirname, 'preload.mjs'),
+      preload: path.join(baseDir, __PRELOAD__),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
