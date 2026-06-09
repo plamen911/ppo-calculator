@@ -43,7 +43,9 @@ export default function App() {
         <div className="actions">
           <button onClick={print}>🖨 Печат</button>
           <button onClick={exportPdf}>📄 Запази като PDF</button>
-          <button onClick={() => setAboutOpen(true)}>ⓘ Относно</button>
+          <button className="about-btn" onClick={() => setAboutOpen(true)} title="Относно" aria-label="Относно">
+            ⓘ
+          </button>
         </div>
       </header>
 

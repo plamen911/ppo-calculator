@@ -79,6 +79,20 @@ body {
   background: rgba(255, 255, 255, 0.28);
 }
 
+/* Subtle, icon-only "Относно" button */
+.actions .about-btn {
+  background: transparent;
+  border: none;
+  opacity: 0.7;
+  font-size: 16px;
+  padding: 6px 8px;
+}
+
+.actions .about-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  opacity: 1;
+}
+
 /* ---- Tabs ---- */
 .tabs {
   display: flex;
