@@ -63,7 +63,8 @@ body {
   opacity: 0.85;
 }
 
-.actions button {
+.actions button,
+.actions .btn {
   margin-left: 8px;
   background: rgba(255, 255, 255, 0.14);
   border: 1px solid rgba(255, 255, 255, 0.35);
@@ -75,7 +76,13 @@ body {
   transition: background 0.15s;
 }
 
-.actions button:hover {
+.actions .btn {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.actions button:hover,
+.actions .btn:hover {
   background: rgba(255, 255, 255, 0.28);
 }
 

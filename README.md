@@ -1,11 +1,8 @@
-# ПГП Калкулатор
+# Калкулатор за план за пожарогасене
 
 Десктоп приложение (React + TypeScript + Electron) за изчисляване на силите и
 средствата за гасене на пожар по **Методиката от Приложение № 5** (формули 1–40,
 справочни Таблици 1–5). Интерфейсът е изцяло на български език. Целева платформа: **Windows**.
-
-Заменя стария `legacy_ppo/JS_ppo` (plain JS, Windows-1251, frameset), като поправя
-изчисленията и ги привежда в съответствие с указанията.
 
 ## Какво изчислява
 
@@ -36,12 +33,50 @@ npm run pack:win   # разпакетирана папка release/win-unpacked/
 npm run dist:win   # NSIS инсталатор + portable .exe (изисква Wine на macOS/Linux)
 ```
 
-- `pack:win` създава `release/win-unpacked/ПГП Калкулатор.exe` — готова за стартиране
+- `pack:win` създава `release/win-unpacked/ppo-calc.exe` — готова за стартиране
   преносима папка. Работи директно на macOS/Linux/Windows.
 - `dist:win` създава инсталатор (NSIS) и единичен portable `.exe`. На **macOS/Linux това
   изисква инсталиран `wine`**; без него стъпката за инсталатора се проваля. Препоръчва се
   билдът за разпространение да се прави на **Windows** или в **CI** (напр. GitHub Actions
   `windows-latest`), където Wine не е нужен.
+
+## Публикуване
+
+Приложението има две части за разпространение: **уеб версия** (статичен билд) и
+**Windows изпълним файл**.
+
+### Уеб версия → Cloudflare Pages
+
+Статичен билд (`base: './'`, работи и на root, и на подпапка).
+
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
+- **Node version:** 22 (задава се чрез променлива `NODE_VERSION=22`)
+
+Свържи GitHub репото в Cloudflare Pages → всеки push към `main` се публикува
+автоматично, а всеки PR получава preview URL.
+
+> Алтернатива: GitHub Pages (build command/output са същите; URL е на подпапка
+> `…/ppo-calculator/`, освен ако се ползва собствен домейн).
+
+### Windows `.exe` → GitHub Releases
+
+Бинарните файлове се качват като GitHub Release, а бутонът „Изтегли за Windows“
+в приложението сочи към последния:
+
+```
+https://github.com/plamen911/ppo-calculator/releases/latest/download/ppo-calc.exe
+```
+
+Стъпки:
+
+```bash
+npm run dist:win   # създава release/ppo-calc.exe (portable) и инсталатор
+gh release create v1.0.0 release/ppo-calc.exe --title "v1.0.0" --notes "First release"
+```
+
+> Името на качения файл трябва да е точно `ppo-calc.exe`, за да работи връзката
+> към последния release.
 
 ## Структура
 

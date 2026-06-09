@@ -47,6 +47,7 @@
       "dist-electron/**/*"
     ],
     "win": {
+      "executableName": "ppo-calc",
       "target": [
         {
           "target": "nsis",
@@ -64,7 +65,11 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "ppo-calc-setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "ppo-calc.${ext}"
     }
   }
 }
