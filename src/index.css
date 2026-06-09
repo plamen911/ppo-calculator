@@ -365,14 +365,16 @@ select:focus {
 
 .step-math {
   margin: 3px 0 3px 6px;
-  padding-left: 12px;
+  padding: 4px 12px;
   border-left: 3px solid var(--accent-soft);
-  overflow-x: auto;
+  overflow: visible;
 }
 
-/* KaTeX display mode adds large default vertical margins — tighten them. */
+/* KaTeX display mode adds large default vertical margins — tighten them
+   without clipping tall constructs like fractions. */
 .step-math .katex-display {
   margin: 0;
+  padding: 2px 0;
 }
 
 .katex-host {
