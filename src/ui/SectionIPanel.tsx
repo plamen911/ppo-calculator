@@ -17,6 +17,7 @@ const initial: SectionIInput = {
   jet: 'C',
   hg: 5,
   protectionJets: 0,
+  Qpa: 20,
 }
 
 export function SectionIPanel() {
@@ -88,6 +89,21 @@ export function SectionIPanel() {
             onChange={(v) => set('protectionJets', v)}
             step={1}
             min={0}
+          />
+          <SelectField
+            label="Q_па — дебит на помпата"
+            value={String(inp.Qpa)}
+            onChange={(v) => set('Qpa', Number(v))}
+            options={[
+              { value: '10', label: '10 l/s' },
+              { value: '16', label: '16 l/s' },
+              { value: '20', label: '20 l/s' },
+              { value: '30', label: '30 l/s' },
+              { value: '40', label: '40 l/s' },
+              { value: '50', label: '50 l/s' },
+              { value: '60', label: '60 l/s' },
+              { value: '100', label: '100 l/s' },
+            ]}
           />
         </fieldset>
 

@@ -14,10 +14,12 @@ import {
 export type JetType = 'B' | 'C'
 export const JET_FLOW: Record<JetType, number> = { B: 7, C: 3.5 }
 
-/** Дебит на струйник за защита (струя "C"), [l/s]. */
+/** Дебит на струйник за защита (струйник "C"), [l/s]. */
 const PROTECTION_JET_FLOW = 3.5
-/** Производителност на един пожарен автомобил, [l/s]. */
-const TRUCK_CAPACITY = 20
+/** Струйници, които подава един екип (пълен състав): 4 тип "C" или 2 тип "B". */
+const TEAM_JETS: Record<JetType, number> = { B: 2, C: 4 }
+/** Коефициент на използване на помпата (формула 23). */
+const PUMP_FACTOR = 0.8
 
 export interface SectionIInput {
   /** t_дс — време до съобщението за пожар, [min]. */
@@ -40,8 +42,10 @@ export interface SectionIInput {
   jet: JetType
   /** h_г — дълбочина на гасене, [m] (5 ръчни, 10 лафетни). */
   hg: number
-  /** Брой струйници за защита (струя "C"). */
+  /** Брой струйници за защита (струйник "C"). */
   protectionJets: number
+  /** Q_па — дебит на помпата на един пожарен автомобил, [l/s]. */
+  Qpa: number
 }
 
 export interface SectionIResult {
@@ -57,8 +61,12 @@ export interface SectionIResult {
   N_jets_total: number
   /** Брой пожарни автомобили. */
   N_trucks: number
-  /** Брой пожарникари (струяри). */
-  N_firefighters: number
+  /** Брой екипи за гасене N_екип^г. */
+  N_teams_g: number
+  /** Общ брой екипи N_екип = N_екип^г + N_екип^з. */
+  N_teams: number
+  /** Личен състав = 4 · N_екип. */
+  N_personnel: number
 }
 
 export function calcSectionI(inp: SectionIInput): CalcOutput<SectionIResult> {
@@ -152,14 +160,12 @@ export function calcSectionI(inp: SectionIInput): CalcOutput<SectionIResult> {
     tex: `N_{стр}^{г} = \\dfrac{${fmt(Qg)}}{${q}} = ${N_jets}\\ \\text{струйника тип "${jet}"}`,
   })
 
-  // Струйници за защита (струя "C").
+  // Струйници за защита (струйник "C").
   const N_jets_total = N_jets + z
-  let Qfact = N_jets * q
   if (z > 0) {
-    Qfact += z * PROTECTION_JET_FLOW
     steps.push({
       kind: 'note',
-      text: `Струйници за защита: N_стр^з = ${z} (струя "C", по ${PROTECTION_JET_FLOW} l/s).`,
+      text: `Струйници за защита: N_стр^з = ${z} (струйник "C", по ${PROTECTION_JET_FLOW} l/s).`,
     })
     steps.push({ kind: 'math', tex: 'N_{стр}^{об} = N_{стр}^{г} + N_{стр}^{з}' })
     steps.push({
@@ -168,29 +174,60 @@ export function calcSectionI(inp: SectionIInput): CalcOutput<SectionIResult> {
     })
   }
 
-  // --- 6. Пожарни автомобили и пожарникари ---
-  const N_trucks = ceil(Qfact / TRUCK_CAPACITY)
-  const N_firefighters = N_jets * 2 + z * 1
-  steps.push({ kind: 'heading', text: '6. Пожарни автомобили и личен състав' })
+  // --- 6. Брой екипи за гасене N_екип (формули 21, 22) ---
+  const n_team = TEAM_JETS[jet]
+  const N_teams_g = ceil(N_jets / n_team)
+  const N_teams_z = z > 0 ? ceil(z / TEAM_JETS.C) : 0 // струйниците за защита са тип "C"
+  const N_teams = N_teams_g + N_teams_z
+  const N_personnel = N_teams * 4
+  steps.push({ kind: 'heading', text: '6. Брой екипи за гасене N_екип' })
   steps.push({
     kind: 'note',
-    text: `Фактически разход: Q = ${fmt(Qfact)} l/s (1 автомобил ≈ ${TRUCK_CAPACITY} l/s).`,
+    text: `Един екип (пълен състав, 4 пожарникари) подава n_стр,екип = ${n_team} струйника тип "${jet}" (4 тип "C" или 2 тип "B").`,
   })
+  steps.push({ kind: 'math', tex: 'N_{екип}^{г} = \\dfrac{N_{стр}^{г}}{n_{стр,екип}}' })
   steps.push({
     kind: 'math',
-    tex: `N_{авт} = \\left\\lceil \\dfrac{${fmt(Qfact)}}{${TRUCK_CAPACITY}} \\right\\rceil = ${N_trucks}`,
+    tex: `N_{екип}^{г} = \\dfrac{${N_jets}}{${n_team}} = ${N_teams_g}\\ \\text{екип(а)}`,
   })
+  if (z > 0) {
+    steps.push({
+      kind: 'math',
+      tex: `N_{екип}^{з} = \\left\\lceil \\dfrac{${z}}{${TEAM_JETS.C}} \\right\\rceil = ${N_teams_z}`,
+    })
+    steps.push({ kind: 'math', tex: 'N_{екип} = N_{екип}^{г} + N_{екип}^{з}' })
+    steps.push({
+      kind: 'math',
+      tex: `N_{екип} = ${N_teams_g} + ${N_teams_z} = ${N_teams}\\ \\text{екип(а)}`,
+    })
+  }
   steps.push({
     kind: 'math',
-    tex:
-      z > 0
-        ? `N_{пожарникари} = 2 \\cdot ${N_jets} + 1 \\cdot ${z} = ${N_firefighters}`
-        : `N_{пожарникари} = 2 \\cdot ${N_jets} = ${N_firefighters}`,
+    tex: `\\text{Личен състав} = 4 \\cdot ${N_teams} = ${N_personnel}\\ \\text{пожарникари}`,
   })
 
+  // --- 7. Брой пожарни автомобили N_па (формула 23) ---
+  let N_trucks = 0
+  steps.push({ kind: 'heading', text: '7. Брой пожарни автомобили N_па' })
+  if (inp.Qpa > 0) {
+    N_trucks = ceil(Qg / (PUMP_FACTOR * inp.Qpa))
+    steps.push({
+      kind: 'note',
+      text: `Q_па = ${fmt(inp.Qpa)} l/s — дебит на помпата; използваемост ${PUMP_FACTOR} (0.8·Q_па).`,
+    })
+    steps.push({ kind: 'math', tex: 'N_{па}^{г} = \\dfrac{Q_{н}^{г}}{0.8\\, Q_{па}}' })
+    steps.push({
+      kind: 'math',
+      tex: `N_{па}^{г} = \\left\\lceil \\dfrac{${fmt(Qg)}}{0.8 \\cdot ${fmt(inp.Qpa)}} \\right\\rceil = ${N_trucks}`,
+    })
+  } else {
+    warnings.push('Q_па трябва да е положителен — въведете дебит на помпата, за да се изчисли броят автомобили.')
+  }
+
   steps.push({ kind: 'result', label: 'Брой струйници (общо)', tex: `${N_jets_total}` })
+  steps.push({ kind: 'result', label: 'Брой екипи', tex: `${N_teams}` })
+  steps.push({ kind: 'result', label: 'Личен състав', tex: `${N_personnel}` })
   steps.push({ kind: 'result', label: 'Брой пожарни автомобили', tex: `${N_trucks}` })
-  steps.push({ kind: 'result', label: 'Брой пожарникари', tex: `${N_firefighters}` })
 
   // Валидни ли са геометрията/формата.
   if (Fg <= 0) {
@@ -209,7 +246,9 @@ export function calcSectionI(inp: SectionIInput): CalcOutput<SectionIResult> {
       N_jets,
       N_jets_total,
       N_trucks,
-      N_firefighters,
+      N_teams_g,
+      N_teams,
+      N_personnel,
     },
     steps,
     warnings,

@@ -15,6 +15,7 @@ const base: SectionIInput = {
   jet: 'B',
   hg: 5,
   protectionJets: 0,
+  Qpa: 20,
 }
 
 describe('freeTime (формула 1)', () => {
@@ -66,12 +67,14 @@ describe('calcSectionI — цялостно изчисление', () => {
     expect(out.results.Fp).toBe(120)
     expect(out.results.Fg).toBe(120) // whole → F_г = F_п
     expect(out.results.Qg).toBeCloseTo(12, 6)
-    // тип A, q=7: N = ceil(12/7) = 2
+    // тип B, q=7: N = ceil(12/7) = 2
     expect(out.results.N_jets).toBe(2)
-    // Q_факт = 2·7 = 14 → автомобили ceil(14/20)=1
+    // автомобили (форм. 23): ceil(12/(0.8·20)) = ceil(12/16) = 1
     expect(out.results.N_trucks).toBe(1)
-    // пожарникари = 2·2 = 4
-    expect(out.results.N_firefighters).toBe(4)
+    // екипи: N_екип^г = ceil(2/2) = 1; личен състав = 4·1 = 4
+    expect(out.results.N_teams_g).toBe(1)
+    expect(out.results.N_teams).toBe(1)
+    expect(out.results.N_personnel).toBe(4)
   })
 
   it('форма "по периметър" дава F_г по формула 8 и Q = F_г·I_н, когато F_п > F_г', () => {
@@ -86,20 +89,32 @@ describe('calcSectionI — цялостно изчисление', () => {
     expect(out.results.Qg).toBeCloseTo(60, 6)
   })
 
-  it('струйници за защита увеличават общия брой и личния състав', () => {
+  it('струйници за защита увеличават общия брой струйници и екипите', () => {
     const out = calcSectionI({ ...base, protectionJets: 2 })
     // N_стр^г=2, +2 защита → общо 4
     expect(out.results.N_jets_total).toBe(4)
-    // Q_факт = 2·7 + 2·3.5 = 21 → автомобили ceil(21/20)=2
-    expect(out.results.N_trucks).toBe(2)
-    // пожарникари = 2·2 + 1·2 = 6
-    expect(out.results.N_firefighters).toBe(6)
+    // автомобилите се определят само по Q_н^г (форм. 23) → защитата не ги променя
+    expect(out.results.N_trucks).toBe(1)
+    // екипи: N_екип^г = ceil(2/2) = 1, N_екип^з = ceil(2/4) = 1 → общо 2
+    expect(out.results.N_teams_g).toBe(1)
+    expect(out.results.N_teams).toBe(2)
+    // личен състав = 4·2 = 8
+    expect(out.results.N_personnel).toBe(8)
   })
 
   it('тип "C" струйник: q = 3.5 l/s', () => {
     const out = calcSectionI({ ...base, jet: 'C' })
     // Q=12, N = ceil(12/3.5) = 4
     expect(out.results.N_jets).toBe(4)
+    // екип "C": n_стр,екип = 4 → N_екип^г = ceil(4/4) = 1
+    expect(out.results.N_teams_g).toBe(1)
+  })
+
+  it('брой автомобили по формула 23: N_па^г = ceil(Q_н^г / (0.8·Q_па))', () => {
+    // perimeter случай: Q_н^г = 60 l/s, Q_па = 20 → ceil(60/(0.8·20)) = ceil(60/16) = 4
+    const out = calcSectionI({ ...base, t_ds: 13, a: 30, b: 40, shape: 'perimeter' })
+    expect(out.results.Qg).toBeCloseTo(60, 6)
+    expect(out.results.N_trucks).toBe(4)
   })
 
   it('връща стъпки и без предупреждения за валиден вход', () => {
