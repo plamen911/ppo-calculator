@@ -17,6 +17,7 @@ files:
   - dist-electron/**/*
 win:
   executableName: ppo-calc-win7
+  icon: build/icon.ico
   target:
     - target: nsis
       arch:

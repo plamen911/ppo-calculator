@@ -23,6 +23,13 @@ const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
 let win: BrowserWindow | null = null
 
+// In dev the renderer is served from the Vite dev server (dist/ doesn't exist),
+// so the window icon lives in public/. In a packaged build public/ is copied
+// into dist/ and that is what ships.
+const iconPath = VITE_DEV_SERVER_URL
+  ? path.join(process.env.APP_ROOT, 'public', 'icon-512.png')
+  : path.join(RENDERER_DIST, 'icon-512.png')
+
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
@@ -30,6 +37,7 @@ function createWindow() {
     minWidth: 900,
     minHeight: 600,
     title: 'Калкулатор за план за пожарогасене',
+    icon: iconPath,
     webPreferences: {
       preload: path.join(baseDir, __PRELOAD__),
       contextIsolation: true,
