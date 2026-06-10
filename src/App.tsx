@@ -41,6 +41,23 @@ export default function App() {
           </div>
         </div>
         <div className="actions">
+          {!window.ppo?.isElectron && (
+            <>
+              <a
+                className="btn"
+                href="https://github.com/plamen911/ppo-calculator/releases/latest/download/ppo-calc.exe"
+              >
+                ⬇ Изтегли за Windows
+              </a>
+              <a
+                className="win7-link"
+                href="https://github.com/plamen911/ppo-calculator/releases/latest/download/ppo-calc-win7.exe"
+                title="Версия за Windows 7"
+              >
+                Win 7
+              </a>
+            </>
+          )}
           <button onClick={print}>🖨 Печат</button>
           <button onClick={exportPdf}>📄 Запази като PDF</button>
           <button className="about-btn" onClick={() => setAboutOpen(true)} title="Относно" aria-label="Относно">

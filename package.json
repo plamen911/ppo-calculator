@@ -14,7 +14,10 @@
     "test:watch": "vitest",
     "dist": "vite build && electron-builder",
     "dist:win": "vite build && electron-builder --win --x64",
-    "pack:win": "vite build && electron-builder --win --x64 --dir"
+    "pack:win": "vite build && electron-builder --win --x64 --dir",
+    "build:electron:win7": "node scripts/build-electron-win7.mjs",
+    "dist:win7": "vite build --mode win7 && node scripts/build-electron-win7.mjs && electron-builder --win --x64 --config electron-builder-win7.yml",
+    "pack:win7": "vite build --mode win7 && node scripts/build-electron-win7.mjs && electron-builder --win --x64 --dir --config electron-builder-win7.yml"
   },
   "dependencies": {
     "katex": "^0.16.11",
@@ -27,13 +30,14 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
-    "electron": "^33.2.0",
-    "electron-builder": "^25.1.8",
+    "electron": "^42.3.3",
+    "electron-builder": "^26.15.2",
+    "esbuild": "^0.28.0",
     "typescript": "^5.6.3",
-    "vite": "^5.4.11",
+    "vite": "^8.0.16",
     "vite-plugin-electron": "^0.28.8",
     "vite-plugin-electron-renderer": "^0.14.6",
-    "vitest": "^2.1.5"
+    "vitest": "^4.1.8"
   },
   "build": {
     "appId": "bg.ppo.calculator",
@@ -46,20 +50,29 @@
       "dist-electron/**/*"
     ],
     "win": {
+      "executableName": "ppo-calc",
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "ppo-calc-setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "ppo-calc.${ext}"
     }
   }
 }
